@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:feature_discovery/src/foundation.dart';
 import 'package:feature_discovery/src/rendering.dart';
 import 'package:feature_discovery/src/widgets.dart';
@@ -45,7 +45,7 @@ class DescribedFeatureOverlay extends StatefulWidget {
   /// It is intended for this to contain a [Text] widget, however, you can pass
   /// any [Widget].
   /// The overlay uses a [DefaultTextStyle] for the title, which is a combination
-  /// of [TextTheme.headline6] from [Theme] and the [textColor].
+  /// of [TextTheme.titleLarge] from [Theme] and the [textColor].
   final Widget? title;
 
   /// This is the second content widget, i.e. it is displayed below [description].
@@ -53,7 +53,7 @@ class DescribedFeatureOverlay extends StatefulWidget {
   /// It is intended for this to contain a [Text] widget, however, you can pass
   /// any [Widget].
   /// The overlay uses a [DefaultTextStyle] for the description, which is a combination
-  /// of [TextTheme.bodyText2] from [Theme] and the [textColor].
+  /// of [TextTheme.bodyMedium] from [Theme] and the [textColor].
   final Widget? description;
 
   /// This is usually an [Icon].
@@ -137,6 +137,9 @@ class DescribedFeatureOverlay extends StatefulWidget {
   /// all of the current steps are dismissed.
   final Future<bool> Function()? onBackgroundTap;
 
+  /// Background radius
+  final double backgroundRadius;
+
   const DescribedFeatureOverlay({
     Key? key,
     required this.featureId,
@@ -147,6 +150,7 @@ class DescribedFeatureOverlay extends StatefulWidget {
     this.title,
     this.description,
     required this.child,
+    this.backgroundRadius = double.infinity,
     this.onOpen,
     this.onComplete,
     this.onDismiss,
@@ -446,13 +450,15 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
   /// in order to match the transition progress and overlay state.
   double _backgroundRadius(Offset anchor) {
     final isBackgroundCentered = _isCloseToTopOrBottom(anchor);
-    final backgroundRadius = min(_screenSize.width, _screenSize.height) *
-        (isBackgroundCentered ? 1.0 : 0.7);
+    final backgroundRadius =
+        [_screenSize.width, widget.backgroundRadius, _screenSize.height].min *
+            (isBackgroundCentered ? 1.0 : 0.7);
     return backgroundRadius;
   }
 
   Offset? _backgroundPosition(Offset anchor, ContentLocation contentLocation) {
-    final width = min(_screenSize.width, _screenSize.height);
+    final width =
+        [_screenSize.width, widget.backgroundRadius, _screenSize.height].min;
     final isBackgroundCentered = _isCloseToTopOrBottom(anchor);
 
     if (isBackgroundCentered) {
@@ -520,7 +526,8 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
   }
 
   Offset? _contentCenterPosition(Offset anchor) {
-    final width = min(_screenSize.width, _screenSize.height);
+    final width =
+        [_screenSize.width, widget.backgroundRadius, _screenSize.height].min;
     final isBackgroundCentered = _isCloseToTopOrBottom(anchor);
 
     if (isBackgroundCentered) {
@@ -576,7 +583,8 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
     final contentOffsetMultiplier = _contentOffsetMultiplier(contentLocation);
     final contentCenterPosition = _contentCenterPosition(anchor)!;
 
-    final contentWidth = min(_screenSize.width, _screenSize.height);
+    final contentWidth =
+        [_screenSize.width, widget.backgroundRadius, _screenSize.height].min;
 
     final dx = contentCenterPosition.dx - contentWidth;
     final contentPosition = Offset(
