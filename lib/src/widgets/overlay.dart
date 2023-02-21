@@ -620,10 +620,7 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
     }
 
     if (widget.barrierDismissible) {
-      background = GestureDetector(
-        onTap: tryDismissThisThenAll,
-        // According to the spec, the user should be able to dismiss by swiping.
-        onPanUpdate: (_) => tryDismissThisThenAll(),
+      background = IgnorePointer(
         child: background,
       );
     }
