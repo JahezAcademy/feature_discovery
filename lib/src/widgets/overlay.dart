@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:collection/collection.dart';
 import 'package:feature_discovery/src/foundation.dart';
 import 'package:feature_discovery/src/rendering.dart';
 import 'package:feature_discovery/src/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 class DescribedFeatureOverlay extends StatefulWidget {
   static const double kDefaultBackgroundOpacity = 0.96;
@@ -137,8 +139,8 @@ class DescribedFeatureOverlay extends StatefulWidget {
   /// all of the current steps are dismissed.
   final Future<bool> Function()? onBackgroundTap;
 
-  /// Background radius
-  final double backgroundRadius;
+  /// Background & tapTarget radius
+  final double backgroundRadius, tapTargetRadius;
 
   const DescribedFeatureOverlay({
     Key? key,
@@ -166,6 +168,7 @@ class DescribedFeatureOverlay extends StatefulWidget {
     this.barrierDismissible = true,
     this.backgroundDismissible = false,
     this.onBackgroundTap,
+    this.tapTargetRadius = 60.0,
   })  : assert(
           barrierDismissible == true || onDismiss == null,
           'Cannot provide both a barrierDismissible and onDismiss function\n'
@@ -590,7 +593,9 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
     final contentPosition = Offset(
       (dx.isNegative) ? 0.0 : dx,
       anchor.dy +
-          contentOffsetMultiplier * (44 + 20), // 44 is the tap target's radius.
+          contentOffsetMultiplier *
+              (widget.tapTargetRadius +
+                  20), // tapTargetRadius is the tap target's radius.
     );
 
     Widget background = Container(
@@ -674,6 +679,7 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
           transitionProgress: _transitionProgress!,
           anchor: anchor,
           color: widget.targetColor,
+          tapTargetRadius: widget.tapTargetRadius,
         ),
         _TapTarget(
           state: _state!,
@@ -682,6 +688,7 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
           color: widget.targetColor,
           onPressed: tryCompleteThis,
           child: widget.tapTarget,
+          tapTargetRadius: widget.tapTargetRadius,
         ),
       ],
     );
@@ -785,7 +792,7 @@ class _Background extends StatelessWidget {
 
 class _Pulse extends StatelessWidget {
   final FeatureOverlayState state;
-  final double transitionProgress;
+  final double transitionProgress, tapTargetRadius;
   final Offset anchor;
   final Color color;
 
@@ -795,6 +802,7 @@ class _Pulse extends StatelessWidget {
     required this.transitionProgress,
     required this.anchor,
     required this.color,
+    required this.tapTargetRadius,
   }) : super(key: key);
 
   double get radius {
@@ -806,10 +814,10 @@ class _Pulse extends StatelessWidget {
         } else {
           expandedPercent = 0.0;
         }
-        return 44.0 + (35.0 * expandedPercent);
+        return tapTargetRadius + (35.0 * expandedPercent);
       case FeatureOverlayState.dismissing:
       case FeatureOverlayState.completing:
-        return 0; //(44.0 + 35.0) * (1.0 - transitionProgress);
+        return 0; //(tapTargetRadius.0 + 35.0) * (1.0 - transitionProgress);
       case FeatureOverlayState.opening:
       case FeatureOverlayState.closed:
         return 0;
@@ -849,7 +857,7 @@ class _Pulse extends StatelessWidget {
 
 class _TapTarget extends StatelessWidget {
   final FeatureOverlayState state;
-  final double transitionProgress;
+  final double transitionProgress, tapTargetRadius;
   final Offset anchor;
   final Widget child;
   final Color color;
@@ -863,6 +871,7 @@ class _TapTarget extends StatelessWidget {
     required this.color,
     required this.state,
     required this.transitionProgress,
+    required this.tapTargetRadius,
   }) : super(key: key);
 
   double get opacity {
@@ -897,7 +906,7 @@ class _TapTarget extends StatelessWidget {
         } else {
           expandedPercent = 0;
         }
-        return 44 + (20 * expandedPercent);
+        return tapTargetRadius + (20 * expandedPercent);
       case FeatureOverlayState.completing:
       case FeatureOverlayState.dismissing:
         return 20 + 24 * (1 - transitionProgress);
@@ -958,4 +967,28 @@ enum FeatureOverlayState {
   opened,
   completing,
   dismissing,
+}
+
+class TapTargetSize extends StatefulWidget {
+  const TapTargetSize({Key? key, required this.child, required this.getSize})
+      : super(key: key);
+  final Widget child;
+  final Function(Size) getSize;
+  @override
+  State<TapTargetSize> createState() => _TapTargetSizeState();
+}
+
+class _TapTargetSizeState extends State<TapTargetSize> {
+  @override
+  void initState() {
+    SchedulerBinding.instance.addPostFrameCallback((Duration duration) {
+      final box = context.findRenderObject() as RenderBox;
+      final center = box.size;
+      log(center.toString());
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
