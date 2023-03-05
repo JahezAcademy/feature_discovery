@@ -17,6 +17,11 @@ enum ContentLocation {
   trivial,
 }
 
+enum FeatureStep {
+  prev,
+  next,
+}
+
 class FeatureDiscovery extends StatelessWidget {
   static Bloc _blocOf(BuildContext context) {
     try {
@@ -38,7 +43,13 @@ class FeatureDiscovery extends StatelessWidget {
   ///
   /// The `onComplete` parameter will be ignored for every active overlay.
   static Future<void> completeCurrentStep(BuildContext context) async =>
-      _blocOf(context).completeStep();
+      _blocOf(context).moveStep();
+
+
+  /// Control steps
+  static Future<void> moveStep(BuildContext context,
+          {FeatureStep? step}) async =>
+      _blocOf(context).moveStep(step: step!);
 
   /// This will return true iff
   /// this [featureId] has been recorded as completed
