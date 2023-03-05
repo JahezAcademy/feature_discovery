@@ -17,6 +17,11 @@ enum ContentLocation {
   trivial,
 }
 
+enum FeatureStep {
+  prev,
+  next,
+}
+
 class FeatureDiscovery extends StatelessWidget {
   static Bloc _blocOf(BuildContext context) {
     try {
