@@ -620,7 +620,7 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
     void tryCompleteThis() async {
       await _complete();
       if (_state == FeatureOverlayState.closed) {
-        await _bloc.completeStep();
+        await _bloc.moveStep();
       }
     }
 
