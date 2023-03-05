@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
+import 'feature_discovery.dart';
 import 'persistence_provider.dart';
 
 class BlocProvider extends StatelessWidget {
@@ -109,19 +110,23 @@ class Bloc {
     _steps = _steps!.where((s) => !_stepsToIgnore!.contains(s)).toList();
     _activeStepIndex = -1;
 
-    await _nextStep();
+    await _moveStep();
   }
 
-  Future<void> completeStep() async {
+  Future<void> moveStep({FeatureStep step = FeatureStep.next}) async {
     if (_steps == null) return;
     // This will ignore the [onComplete] function of all overlays.
     _eventsIn.add(EventType.complete);
-    await _nextStep();
+    await _moveStep(step: step);
   }
 
-  Future<void> _nextStep() async {
+  Future<void> _moveStep({FeatureStep step = FeatureStep.next}) async {
     if (activeFeatureId != null) unawaited(_saveCompletionOf(activeFeatureId));
-    _activeStepIndex = _activeStepIndex! + 1;
+    if (step == FeatureStep.next) {
+      _activeStepIndex = _activeStepIndex! + 1;
+    } else {
+      _activeStepIndex = _activeStepIndex! - 1;
+    }
     _activeOverlays = 0;
 
     if (_activeStepIndex! < _steps!.length) {
