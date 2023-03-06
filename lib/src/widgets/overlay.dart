@@ -620,7 +620,7 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
     void tryCompleteThis() async {
       await _complete();
       if (_state == FeatureOverlayState.closed) {
-        await _bloc.completeStep();
+        await _bloc.moveStep();
       }
     }
 
@@ -646,18 +646,20 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
           ),
           children: <Widget>[
             LayoutId(
-              id: BackgroundContentLayout.background,
-              child: _Background(
-                transitionProgress: _transitionProgress!,
-                color: widget.backgroundColor ?? Theme.of(context).primaryColor,
-                defaultOpacity: widget.backgroundOpacity,
-                state: _state!,
-                overflowMode: widget.overflowMode,
-                tryDismissThisThenAll: tryDismissThisThenAll,
-                backgroundDismissible: widget.backgroundDismissible,
-                onBackgroundTap: widget.onBackgroundTap,
-              ),
-            ),
+                id: BackgroundContentLayout.background,
+                child: IgnorePointer(
+                  child: _Background(
+                    transitionProgress: _transitionProgress!,
+                    color: widget.backgroundColor ??
+                        Theme.of(context).primaryColor,
+                    defaultOpacity: widget.backgroundOpacity,
+                    state: _state!,
+                    overflowMode: widget.overflowMode,
+                    tryDismissThisThenAll: tryDismissThisThenAll,
+                    backgroundDismissible: widget.backgroundDismissible,
+                    onBackgroundTap: widget.onBackgroundTap,
+                  ),
+                )),
             LayoutId(
               id: BackgroundContentLayout.content,
               child: Content(
