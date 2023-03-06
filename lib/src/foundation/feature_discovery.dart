@@ -45,11 +45,15 @@ class FeatureDiscovery extends StatelessWidget {
   static Future<void> completeCurrentStep(BuildContext context) async =>
       _blocOf(context).moveStep();
 
-
   /// Control steps
   static Future<void> moveStep(BuildContext context,
           {FeatureStep? step}) async =>
       _blocOf(context).moveStep(step: step!);
+
+  static bool? isFirst(BuildContext context, String currentFeatureId) =>
+      _blocOf(context).isFirst(currentFeatureId);
+  static bool? isLast(BuildContext context, String currentFeatureId) =>
+      _blocOf(context).isLast(currentFeatureId);
 
   /// This will return true iff
   /// this [featureId] has been recorded as completed

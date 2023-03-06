@@ -120,6 +120,16 @@ class Bloc {
     await _moveStep(step: step);
   }
 
+  bool? isLast(String currentFeatureId) {
+    if (_steps == null) return null;
+    return _steps!.last == activeFeatureId;
+  }
+
+  bool? isFirst(String currentFeatureId) {
+    if (_steps == null) return null;
+    return _steps!.first == currentFeatureId;
+  }
+
   Future<void> _moveStep({FeatureStep step = FeatureStep.next}) async {
     if (activeFeatureId != null) unawaited(_saveCompletionOf(activeFeatureId));
     if (step == FeatureStep.next) {
