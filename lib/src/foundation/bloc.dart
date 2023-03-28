@@ -60,6 +60,8 @@ class Bloc {
   /// Steps that have been previously completed.
   Set<String?>? _stepsToIgnore;
 
+  ScrollController? scrollController;
+
   int? _activeStepIndex;
 
   String? get activeFeatureId => _steps == null ||
@@ -101,7 +103,7 @@ class Bloc {
     _eventsController.close();
   }
 
-  void discoverFeatures(Iterable<String> steps) async {
+  void discoverFeatures(Iterable<String> steps, {ScrollController? scrollController}) async {
     assert(steps.isNotEmpty,
         'You need to pass at least one step to [FeatureDiscovery.discoverFeatures].');
 
@@ -109,6 +111,7 @@ class Bloc {
     _stepsToIgnore = await _alreadyCompletedSteps;
     _steps = _steps!.where((s) => !_stepsToIgnore!.contains(s)).toList();
     _activeStepIndex = -1;
+    this.scrollController = scrollController;
 
     await _moveStep();
   }
