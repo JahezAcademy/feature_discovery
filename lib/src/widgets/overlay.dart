@@ -142,6 +142,7 @@ class DescribedFeatureOverlay extends StatefulWidget {
 
   /// Background & tapTarget radius
   final double backgroundRadius, tapTargetRadius;
+  final Offset? offset;
 
   const DescribedFeatureOverlay({
     Key? key,
@@ -169,7 +170,8 @@ class DescribedFeatureOverlay extends StatefulWidget {
     this.barrierDismissible = true,
     this.backgroundDismissible = false,
     this.onBackgroundTap,
-    this.tapTargetRadius = 60.0,
+    this.tapTargetRadius = 40.0,
+    this.offset,
   })  : assert(
           barrierDismissible == true || onDismiss == null,
           'Cannot provide both a barrierDismissible and onDismiss function\n'
@@ -721,8 +723,10 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
   @override
   Widget build(BuildContext context) => AnchoredOverlay(
         showOverlay: _state != FeatureOverlayState.closed,
-        overlayBuilder: (BuildContext context, Offset anchor) =>
-            _buildOverlay(anchor),
+        overlayBuilder: (BuildContext context, Offset anchor) {
+          anchor = widget.offset ?? anchor;
+          return _buildOverlay(anchor);
+        },
         child: widget.child,
       );
 }
