@@ -35,8 +35,10 @@ class FeatureDiscovery extends StatelessWidget {
   /// Steps are the featureIds of the overlays.
   /// Though they can be placed in any [Iterable], it is recommended to pass them as a [Set]
   /// because this ensures that every step is only shown once.
-  static void discoverFeatures(BuildContext context, Iterable<String> steps) =>
-      _blocOf(context).discoverFeatures(steps.toList());
+  static void discoverFeatures(BuildContext context, Iterable<String> steps,
+          {ScrollController? scrollController}) =>
+      _blocOf(context)
+          .discoverFeatures(steps.toList(), scrollController: scrollController);
 
   /// This will force the completion of the current step and continue
   /// onto the next step after the completion animation of the current overlay.

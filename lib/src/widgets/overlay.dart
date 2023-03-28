@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:feature_discovery/src/foundation.dart';
 import 'package:feature_discovery/src/rendering.dart';
 import 'package:feature_discovery/src/widgets.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -625,8 +626,17 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
     }
 
     if (widget.barrierDismissible) {
-      background = IgnorePointer(
-        child: background,
+      background = Listener(
+        behavior: HitTestBehavior.translucent,
+        // for mouse scroll
+        onPointerSignal: _scrollListener,
+        child: GestureDetector(
+          // for touch scroll
+          onVerticalDragUpdate: _scrollListener,
+          onTapCancel: () {},
+          onTap: tryDismissThisThenAll,
+          child: background,
+        ),
       );
     }
 
@@ -694,6 +704,18 @@ class _DescribedFeatureOverlayState extends State<DescribedFeatureOverlay>
         ),
       ],
     );
+  }
+
+  void _scrollListener(dynamic event) {
+    if (event is PointerScrollEvent || event is DragUpdateDetails) {
+      final currentScroll = event is DragUpdateDetails
+          ? _bloc.scrollController!.offset - event.delta.dy
+          : _bloc.scrollController!.offset + event.scrollDelta.dy;
+      if (currentScroll < 0 ||
+          currentScroll > _bloc.scrollController!.position.maxScrollExtent)
+        return;
+      _bloc.scrollController!.jumpTo(currentScroll);
+    }
   }
 
   @override
