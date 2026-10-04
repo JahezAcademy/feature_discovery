@@ -275,10 +275,10 @@ class _ContentState extends State<Content> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16.0),
                 color: Colors.blue,
-                child: Column(
+                child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(bottom: 8.0),
                       child: Text(
                         'DISH REPUBLIC',
@@ -288,7 +288,7 @@ class _ContentState extends State<Content> {
                         ),
                       ),
                     ),
-                    const Text(
+                    Text(
                       'Eat',
                       style: TextStyle(
                         color: Colors.white,
